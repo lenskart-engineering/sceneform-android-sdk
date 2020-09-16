@@ -3,12 +3,15 @@ package com.google.ar.sceneform;
 import android.content.Context;
 import android.media.Image;
 
-import android.support.annotation.Nullable;
-import android.support.annotation.UiThread;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
+
+import androidx.annotation.IntRange;
+import androidx.annotation.Nullable;
+import androidx.annotation.UiThread;
+
 import com.google.ar.core.Anchor;
 import com.google.ar.core.CameraConfig.FacingDirection;
 import com.google.ar.core.Config;
@@ -28,9 +31,11 @@ import com.google.ar.sceneform.rendering.Color;
 import com.google.ar.sceneform.rendering.EnvironmentalHdrLightEstimate;
 import com.google.ar.sceneform.rendering.GLHelper;
 
+import com.google.ar.sceneform.rendering.Material;
 import com.google.ar.sceneform.rendering.PlaneRenderer;
 
 import com.google.ar.sceneform.rendering.Renderer;
+import com.google.ar.sceneform.rendering.RenderingResources;
 import com.google.ar.sceneform.rendering.ThreadPools;
 import com.google.ar.sceneform.utilities.AndroidPreconditions;
 import com.google.ar.sceneform.utilities.ArCoreVersion;
@@ -161,6 +166,9 @@ public class ArSceneView extends SceneView {
     }
   }
 
+  public void setCameraStreamRenderPriority(@IntRange(from = 0L,to = 7L) int var1) {
+    this.cameraStream.setRenderPriority(var1);
+  }
   
 
 
@@ -437,6 +445,24 @@ public class ArSceneView extends SceneView {
       // Setup Camera Stream if needed.
       if (!cameraStream.isTextureInitialized()) {
         cameraStream.initializeTexture(frame);
+
+        // Occlusion Fix
+        CompletableFuture<Material> materialFuture =
+                Material.builder()
+                        .setSource(
+                                getContext(),
+                                RenderingResources.GetSceneformResource(
+                                        getContext(), RenderingResources.Resource.CAMERA_MATERIAL_WITH_OCCLUSION))
+                        .build();
+
+        materialFuture
+                .thenAccept(
+                        material -> cameraStream.setCameraMaterial(material))
+                .exceptionally(
+                        throwable -> {
+                          cameraStream.setCameraMaterialToDefault();
+                          return null;
+                        });
       }
 
       // Recalculate camera Uvs if necessary.

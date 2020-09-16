@@ -1,8 +1,9 @@
 package com.google.ar.sceneform;
 
-import android.support.annotation.Nullable;
 import android.view.MotionEvent;
 import android.view.ViewConfiguration;
+
+import androidx.annotation.Nullable;
 
 import com.google.ar.sceneform.collision.Collider;
 import com.google.ar.sceneform.collision.CollisionShape;
@@ -18,6 +19,7 @@ import com.google.ar.sceneform.rendering.Renderable;
 import com.google.ar.sceneform.rendering.RenderableInstance;
 import com.google.ar.sceneform.rendering.Renderer;
 
+import com.google.ar.sceneform.rendering.SkeletonRig;
 import com.google.ar.sceneform.utilities.AndroidPreconditions;
 import com.google.ar.sceneform.utilities.ChangeId;
 import com.google.ar.sceneform.utilities.Preconditions;
@@ -852,8 +854,8 @@ public class Node extends NodeParent implements TransformProvider {
     }
 
     if (renderableInstance != null) {
-      if (active) {
-        renderableInstance.detachFromRenderer();
+      if (active || renderableInstance.getRenderable() != renderable) {
+        renderableInstance.detachFromRenderer(true);
       }
       renderableInstance = null;
     }
@@ -1406,7 +1408,7 @@ public class Node extends NodeParent implements TransformProvider {
     active = false;
 
     if (renderableInstance != null) {
-      renderableInstance.detachFromRenderer();
+      renderableInstance.detachFromRenderer(false);
     }
 
     if (lightInstance != null) {
@@ -1584,5 +1586,10 @@ public class Node extends NodeParent implements TransformProvider {
     }
 
     return Preconditions.checkNotNull(scene.getView().getRenderer());
+  }
+
+  @Nullable
+  SkeletonRig getSkeletonRig() {
+    return this.renderableInstance != null ? this.renderableInstance.getSkeletonRig() : null;
   }
 }

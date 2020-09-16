@@ -1,9 +1,11 @@
 package com.google.ar.sceneform.rendering;
 
 import android.net.Uri;
-import android.support.annotation.Nullable;
-import android.support.annotation.Size;
 import android.util.Log;
+
+import androidx.annotation.Nullable;
+import androidx.annotation.Size;
+
 import com.google.android.filament.Engine;
 import com.google.android.filament.Entity;
 import com.google.android.filament.EntityInstance;
@@ -13,9 +15,9 @@ import com.google.android.filament.RenderableManager;
 import com.google.android.filament.TransformManager;
 import com.google.android.filament.gltfio.AssetLoader;
 import com.google.android.filament.gltfio.FilamentAsset;
-import com.google.android.filament.gltfio.ResourceLoader;
 
 
+import com.google.android.filament.gltfio.FilamentInstance;
 import com.google.ar.sceneform.collision.Box;
 import com.google.ar.sceneform.common.TransformProvider;
 import com.google.ar.sceneform.math.Matrix;
@@ -69,11 +71,12 @@ public class RenderableInstance {
   @Entity private int childEntity = 0;
   int renderableId = ChangeId.EMPTY_ID;
 
-  
 
 
 
-  
+
+  AssetLoader loader;
+
   @Nullable
   FilamentAsset filamentAsset;
 
@@ -117,11 +120,10 @@ public class RenderableInstance {
 
       Engine engine = EngineInstance.getEngine().getFilamentEngine();
 
-      AssetLoader loader =
-          new AssetLoader(
-              engine,
-              RenderableInternalFilamentAssetData.getMaterialProvider(),
-              EntityManager.get());
+      loader = new AssetLoader(
+          engine,
+          RenderableInternalFilamentAssetData.getMaterialProvider(),
+          EntityManager.get());
 
       FilamentAsset createdAsset = renderableData.isGltfBinary ? loader.createAssetFromBinary(renderableData.gltfByteBuffer)
               : loader.createAssetFromJson(renderableData.gltfByteBuffer);
@@ -305,8 +307,7 @@ public class RenderableInstance {
     attachFilamentAssetToRenderer();
   }
 
-  
-  void detachFilamentAssetFromRenderer() {
+  void detachFilamentAssetFromRenderer(boolean shouldDestroyAsset) {
     FilamentAsset currentFilamentAsset = filamentAsset;
     if (currentFilamentAsset != null) {
       int[] entities = currentFilamentAsset.getEntities();
@@ -315,16 +316,23 @@ public class RenderableInstance {
       }
       int root = currentFilamentAsset.getRoot();
       Preconditions.checkNotNull(attachedRenderer).getFilamentScene().removeEntity(root);
+      if (shouldDestroyAsset) {
+        loader.destroyAsset(filamentAsset);
+        filamentAsset = null;
+      }
     }
   }
 
   /** @hide */
-  public void detachFromRenderer() {
+  public void detachFromRenderer(boolean shouldDestroyAsset) {
     Renderer rendererToDetach = attachedRenderer;
     if (rendererToDetach != null) {
-      detachFilamentAssetFromRenderer();
+      detachFilamentAssetFromRenderer(shouldDestroyAsset);
       rendererToDetach.removeInstance(this);
       renderable.detatchFromRenderer();
+      if (shouldDestroyAsset) {
+        attachedRenderer = null;
+      }
     }
   }
 
@@ -432,6 +440,11 @@ public class RenderableInstance {
     transformManager.create(
         childEntity, transformManager.getInstance(entity), relativeTransform.data);
     return childEntity;
+  }
+
+  @Nullable
+  public SkeletonRig getSkeletonRig() {
+    return this.renderable instanceof ModelRenderable ? ((ModelRenderable)this.renderable).getSkeletonRig() : null;
   }
 
   /** Releases resources held by a {@link RenderableInstance} */

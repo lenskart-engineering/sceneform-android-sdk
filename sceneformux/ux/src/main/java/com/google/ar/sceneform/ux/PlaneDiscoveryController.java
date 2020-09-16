@@ -15,8 +15,9 @@
  */
 package com.google.ar.sceneform.ux;
 
-import android.support.annotation.Nullable;
 import android.view.View;
+
+import androidx.annotation.Nullable;
 
 /**
  * This view manages showing the plane discovery instructions view. You can assign into the

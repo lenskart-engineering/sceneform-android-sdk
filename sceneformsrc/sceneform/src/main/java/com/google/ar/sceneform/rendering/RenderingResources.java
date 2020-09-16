@@ -4,7 +4,7 @@ import android.content.Context;
 
 import com.google.ar.sceneform.utilities.LoadHelper;
 
-final class RenderingResources {
+public final class RenderingResources {
 
   public static enum Resource {
     CAMERA_MATERIAL,
@@ -16,6 +16,7 @@ final class RenderingResources {
     PLANE_MATERIAL,
     PLANE,
     VIEW_RENDERABLE_MATERIAL,
+    CAMERA_MATERIAL_WITH_OCCLUSION
   };
 
   
@@ -23,6 +24,8 @@ final class RenderingResources {
     switch (resource) {
       case CAMERA_MATERIAL:
         return LoadHelper.rawResourceNameToIdentifier(context, "sceneform_camera_material");
+      case CAMERA_MATERIAL_WITH_OCCLUSION:
+        return LoadHelper.rawResourceNameToIdentifier(context, "sceneform_camera_material_occlusion_fix");
       case OPAQUE_COLORED_MATERIAL:
         return LoadHelper.rawResourceNameToIdentifier(context, "sceneform_opaque_colored_material");
       case TRANSPARENT_COLORED_MATERIAL:

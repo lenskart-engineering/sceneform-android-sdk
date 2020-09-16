@@ -3,8 +3,10 @@ package com.google.ar.sceneform.rendering;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
-import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
+
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+
 import com.google.android.filament.MaterialInstance;
 
 
@@ -283,7 +285,7 @@ public class Material {
   //     //depot/google3/third_party/arcore/ar/sceneform/loader/model/model_material_jni.cc:api
   // )
 
-  com.google.android.filament.MaterialInstance getFilamentMaterialInstance() {
+  public com.google.android.filament.MaterialInstance getFilamentMaterialInstance() {
     // Filament Material Instance is only set to null when it is disposed or destroyed, so any
     // usage after that point is an internal error.
     if (!internalMaterialInstance.isValidInstance()) {
