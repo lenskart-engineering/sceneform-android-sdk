@@ -512,8 +512,7 @@ public class Scene extends NodeParent {
   private void setupLightProbe(SceneView view) {
     Preconditions.checkNotNull(view, "Parameter \"view\" was null.");
 
-    int defaultLightProbeId =
-        LoadHelper.rawResourceNameToIdentifier(view.getContext(), DEFAULT_LIGHTPROBE_RESOURCE_NAME);
+    int defaultLightProbeId = R.raw.sceneform_default_light_probe;
 
     if (defaultLightProbeId == LoadHelper.INVALID_RESOURCE_IDENTIFIER) {
       // TODO: Better log message.
