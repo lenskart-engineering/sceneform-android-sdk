@@ -1,8 +1,10 @@
 package com.google.ar.sceneform.resources;
 
-import android.support.annotation.GuardedBy;
-import android.support.annotation.Nullable;
+import androidx.annotation.GuardedBy;
+import androidx.annotation.Nullable;
+
 import com.google.ar.sceneform.utilities.Preconditions;
+
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Iterator;

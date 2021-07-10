@@ -1,11 +1,12 @@
 package com.google.ar.sceneform.rendering;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.net.Uri;
-import android.support.annotation.IntRange;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
+import androidx.annotation.IntRange;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.google.ar.sceneform.collision.Box;
 import com.google.ar.sceneform.collision.CollisionShape;
@@ -315,7 +316,15 @@ public abstract class Renderable {
 
     public B setSource(Context context, Callable<InputStream> inputStreamCreator) {
       Preconditions.checkNotNull(inputStreamCreator);
-      this.sourceUri = null;
+      this.sourceUri = new Uri.Builder().scheme(ContentResolver.SCHEME_FILE).build();
+      this.inputStreamCreator = inputStreamCreator;
+      this.context = context;
+      return getSelf();
+    }
+
+    public B setSource(Context context, Uri sourceUri, Callable<InputStream> inputStreamCreator) {
+      Preconditions.checkNotNull(inputStreamCreator);
+      this.sourceUri = sourceUri;
       this.inputStreamCreator = inputStreamCreator;
       this.context = context;
       return getSelf();
